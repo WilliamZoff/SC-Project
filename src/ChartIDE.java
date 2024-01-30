@@ -73,12 +73,10 @@ public class ChartIDE {
             private void drawGrid(@org.jetbrains.annotations.NotNull Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
 
-                // Set the color for the grid lines
-                g2d.setColor(Color.GRAY);
-
-                // Define the pattern for dashed lines
+                // Define the pattern for dashed lines and set color
                 float[] dashPattern = { 5, 3 }; // 5 pixels line, 3 pixels space
                 g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+                g2d.setColor(Color.GRAY);
 
                 int width = getWidth();
                 int height = getHeight();
