@@ -1,4 +1,4 @@
-import java.awt.{Color, Graphics}
+import java.awt.{BasicStroke, Color, Graphics, Graphics2D}
 import scala.jdk.CollectionConverters._
 import scala.math._
 import scala.util.control.Breaks._
@@ -94,17 +94,30 @@ object GraphicalElementsManager {
 
 // BoundingBox command - sets area to draw in
 case class BoundingBox(x1: Int, y1: Int, x2: Int, y2: Int) extends GraphicalElement {
-  // Calculate the properties and make them public
   val x: Int = Math.min(x1, x2)
-  val y: Int = Math.min(-y1, -y2)  // Considering the inversion of y for consistency
+  val y: Int = Math.min(-y1, -y2)  // Inverting y for consistency
   val width: Int = Math.abs(x2 - x1)
   val height: Int = Math.abs(y2 - y1)
 
   def draw(g: Graphics, fill: Boolean = false): Unit = {
-    // Use the properties directly in the draw method
-    g.drawRect(x, y, width, height)
+    val g2d = g.asInstanceOf[Graphics2D] // Cast to use advanced features
+
+    // Set the stroke as dashed
+    val dash = Array(10.0f, 10.0f) // Dashed pattern
+    val stroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10.0f, dash, 0.0f)
+    g2d.setStroke(stroke)
+
+    // Set color to red
+    g2d.setColor(Color.RED)
+
+    // Draw the rectangle with an adjustment to include all borders
+    g2d.drawRect(x, y, width - 1, height - 1)
+
+    // Reset stroke to default for other elements if needed
+    g2d.setStroke(new BasicStroke())
   }
 }
+
 
 // Draw command - draws elements in list
 case class DrawableGroup(color: Color, elements: List[GraphicalElement]) extends GraphicalElement {
