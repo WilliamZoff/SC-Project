@@ -1,3 +1,5 @@
+//@Logika: --par --par-branch --background type
+import org.sireum.{Option => _, String => _, None => _, Some => _, _}
 import java.awt.{BasicStroke, Color, Graphics, Graphics2D}
 import scala.jdk.CollectionConverters._
 import scala.math._
@@ -14,14 +16,18 @@ object GraphicalElementsManager {
 
   def addElement(element: GraphicalElement): Unit = {
     if (boundingBox.isEmpty && !element.isInstanceOf[BoundingBox]) {
-      throw new IllegalStateException("BOUNDINGBOX must be the first command")
+      throw new IllegalStateException("BOUNDING-BOX must be the first command")
     }
     elements = elements :+ element
   }
 
   def setBoundingBox(box: BoundingBox): Unit = {
+    Contract(
+      Requires(elements.isEmpty),
+      Ensures(boundingBox.nonEmpty && boundingBox.contains(box))
+    )
     if (elements.nonEmpty) {
-      throw new IllegalStateException("BOUNDINGBOX must be the first command")
+      throw new IllegalStateException("BOUNDING-BOX must be the first command")
     }
     boundingBox = Some(box)
   }
@@ -48,6 +54,13 @@ object GraphicalElementsManager {
     }
     element.draw(g)
     g.setClip(null) // Reset clipping to draw normally outside the method
+  }
+
+  // Utility to parse sub-commands within a DRAW command
+  def parseSubCommands(subCommand: String): Option[GraphicalElement] = {
+    val trimmed = subCommand.trim
+    if (trimmed.nonEmpty) Some(parseCommandToElement(trimmed))
+    else None
   }
 
   def parseCommandToElement(command: String): GraphicalElement = {
@@ -167,7 +180,6 @@ case class Line(x1: Int, y1: Int, x2: Int, y2: Int) extends GraphicalElement {
         }
       }
     }
-
   }
 }
 
