@@ -2,8 +2,8 @@
 import org.sireum.{Option => _, String => _, None => _, Some => _, _}
 import java.awt.{BasicStroke, Color, Graphics, Graphics2D}
 import scala.jdk.CollectionConverters._
-import scala.math._
 import scala.util.control.Breaks._
+import scala.collection.mutable
 
 
 trait GraphicalElement {
@@ -12,13 +12,31 @@ trait GraphicalElement {
 
 object GraphicalElementsManager {
   var elements: List[GraphicalElement] = List()
+  private val undoStack = mutable.Stack[List[GraphicalElement]]()
+  private val redoStack = mutable.Stack[List[GraphicalElement]]()
   var boundingBox: Option[BoundingBox] = None
 
   def addElement(element: GraphicalElement): Unit = {
     if (boundingBox.isEmpty && !element.isInstanceOf[BoundingBox]) {
       throw new IllegalStateException("BOUNDING-BOX must be the first command")
     }
+    undoStack.push(elements)
     elements = elements :+ element
+    redoStack.clear() // Whenever a new element is added, clear the redo stack
+  }
+
+  def undoLastCommand(): Unit = {
+    if (undoStack.nonEmpty) {
+      redoStack.push(elements)
+      elements = undoStack.pop()
+    }
+  }
+
+  def redoLastCommand(): Unit = {
+    if (redoStack.nonEmpty) {
+      undoStack.push(elements)
+      elements = redoStack.pop()
+    }
   }
 
   def setBoundingBox(box: BoundingBox): Unit = {
@@ -36,15 +54,13 @@ object GraphicalElementsManager {
     elements.asJava
   }
 
-  def parseColor(colorName: String): Color = {
-    colorName.toLowerCase match {
-      case "black" => Color.BLACK
-      case "red" => Color.RED
-      case "green" => Color.GREEN
-      case "blue" => Color.BLUE
-      case "yellow" => Color.YELLOW
-      case _ => Color.BLACK // Default color
-    }
+  def parseColor(colorName: String): Color = colorName.trim.toLowerCase match {
+    case "black" => Color.BLACK
+    case "red" => Color.RED
+    case "green" => Color.GREEN
+    case "blue" => Color.BLUE
+    case "yellow" => Color.YELLOW
+    case _ => Color.BLACK // Default color
   }
 
   // Ensure all elements respect the optional bounding box
@@ -64,17 +80,15 @@ object GraphicalElementsManager {
   }
 
   def parseCommandToElement(command: String): GraphicalElement = {
-    println(s"Original command: $command")  // Log the original command
-
+    println(s"__________________________________________")
     val trimmedCommand = command.trim.replaceAll("\\s+", " ")
-    println(s"Trimmed and normalized command: $trimmedCommand")  // Log the normalized command
-
     val commandType = trimmedCommand.takeWhile(_ != '(').trim
-    println(s"Command type: $commandType")  // Log the extracted command type
+    val innerCommand = trimmedCommand.drop(commandType.length + 1).dropRight(1)
+    val args = splitArgs(innerCommand)
 
-    val args = trimmedCommand.substring(trimmedCommand.indexOf('(') + 1, trimmedCommand.lastIndexOf(')'))
-      .split(",")
-      .map(_.trim)
+    println(s"Original command: $command")  // Log the original command
+    println(s"Command type: $commandType")
+    println(s"Inner command: $innerCommand")
     println(s"Arguments: ${args.mkString(", ")}")  // Log the arguments
 
     commandType.toUpperCase match {
@@ -102,6 +116,28 @@ object GraphicalElementsManager {
       case _ =>
         throw new IllegalArgumentException(s"Unknown command: $commandType")
     }
+  }
+
+  // Split arguments considering nested parentheses and quotes
+  def splitArgs(input: String): Array[String] = {
+    val args = new scala.collection.mutable.ArrayBuffer[String]()
+    var current = new StringBuilder()
+    var level = 0
+    var inQuotes = false
+
+    input.foreach { char =>
+      char match {
+        case '(' if !inQuotes => level += 1; current += char
+        case ')' if !inQuotes => level -= 1; current += char
+        case ',' if level == 0 && !inQuotes =>
+          args += current.toString().trim; current.clear()
+        case '"' => inQuotes = !inQuotes; current += char
+        case _ => current += char
+      }
+    }
+    if (current.nonEmpty) args += current.toString().trim // Add the last part
+
+    args.toArray
   }
 }
 
@@ -135,20 +171,24 @@ case class BoundingBox(x1: Int, y1: Int, x2: Int, y2: Int) extends GraphicalElem
 // Draw command - draws elements in list
 case class DrawableGroup(color: Color, elements: List[GraphicalElement]) extends GraphicalElement {
   def draw(g: Graphics, fill: Boolean = false): Unit = {
-    g.setColor(color)
-    elements.foreach(_.draw(g))
-    g.setColor(Color.BLACK) // Reset to default after drawing
+    val g2d = g.asInstanceOf[Graphics2D]
+    g2d.setColor(color) // Set the color
+    elements.foreach(element => element.draw(g2d, fill))
+    g2d.setColor(Color.BLACK) // Reset color to default after drawing
   }
 }
 
+
 // FilledEllement command - takes color and element to fill
 case class FilledElement(color: Color, element: GraphicalElement) extends GraphicalElement {
-  def draw(g: Graphics, fill: Boolean = false): Unit = {
-    g.setColor(color)
-    element.draw(g, fill = true)
-    g.setColor(Color.BLACK) // Reset to default after drawing
+  def draw(g: Graphics, fill: Boolean = true): Unit = { // Default to true to ensure filling is applied
+    val g2d = g.asInstanceOf[Graphics2D]
+    g2d.setColor(color)
+    element.draw(g2d, fill = true) // Pass true to enforce filling
+    g2d.setColor(Color.BLACK) // Reset color to default after drawing
   }
 }
+
 
 
 // Line element using Bresenham's algorithm

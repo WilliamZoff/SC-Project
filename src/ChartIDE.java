@@ -4,7 +4,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ChartIDE {
     public static void main(String[] args) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -35,35 +35,40 @@ public class ChartIDE {
         JSplitPane splitPane = new JSplitPane();
         frame.add(splitPane, BorderLayout.CENTER);
 
+        // Initialize graphicsViwer
+        JPanel graphicsViewer = new JPanel();
+
         // Create JMenuBar and JMenuItems
         JMenuBar menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
 
-        JMenu fileMenu = new JMenu("File");
-        menuBar.add(fileMenu);
+        // Create buttons
+        JButton undoButton = new JButton("Undo");
+        JButton redoButton = new JButton("Redo");
+        JButton origoButton = new JButton("Origo");
 
-        // Add items to the File menu
-        JMenuItem openFile = new JMenuItem("Open File");
-        JMenuItem saveFile = new JMenuItem("Save File");
-        fileMenu.add(openFile);
-        fileMenu.add(saveFile);
+        // Add buttons to the menu bar
+        menuBar.add(undoButton);
+        menuBar.add(redoButton);
+        menuBar.add(origoButton);
 
-        // Action Listeners for Menu Items
-        openFile.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            int result = fileChooser.showOpenDialog(frame);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                // Code to handle file opening
-            }
+        JPanel finalGraphicsViewer2 = graphicsViewer;
+        undoButton.addActionListener(e -> {
+            GraphicalElementsManager.undoLastCommand();
+            finalGraphicsViewer2.repaint();
         });
-        saveFile.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            int result = fileChooser.showSaveDialog(frame);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File fileToSave = fileChooser.getSelectedFile();
-                // Code to handle file saving
-            }
+
+        JPanel finalGraphicsViewer3 = graphicsViewer;
+        redoButton.addActionListener(e -> {
+            GraphicalElementsManager.redoLastCommand();
+            finalGraphicsViewer3.repaint();
+        });
+
+        AtomicBoolean showOrigo = new AtomicBoolean(true);  // Initially show origo
+        JPanel finalGraphicsViewer4 = graphicsViewer;
+        origoButton.addActionListener(e -> {
+            showOrigo.set(!showOrigo.get());
+            finalGraphicsViewer4.repaint();
         });
 
         // Label to display coordinates
@@ -71,7 +76,7 @@ public class ChartIDE {
         frame.add(coordinateLabel, BorderLayout.SOUTH);
 
         // Panel for graphics viewer with custom drawing
-        JPanel graphicsViewer = new JPanel() {
+        graphicsViewer = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -85,9 +90,11 @@ public class ChartIDE {
                 g2d.translate(centerX, centerY);
 
                 // Optionally, draw a small cross at the origin and label it
-                g2d.drawLine(-10, 0, 10, 0); // horizontal line
-                g2d.drawLine(0, -10, 0, 10); // vertical line
-                g2d.drawString("(0,0)", 5, -5); // label for origin
+                if (showOrigo.get()) {
+                    g2d.drawLine(-10, 0, 10, 0); // horizontal line
+                    g2d.drawLine(0, -10, 0, 10); // vertical line
+                    g2d.drawString("(0,0)", 5, -5); // label for origin
+                }
 
                 // Draw grid from the new origin
                 drawGrid(g2d);
@@ -149,12 +156,13 @@ public class ChartIDE {
         splitPane.setLeftComponent(graphicsViewer);
 
         // Add MouseMotionListener to graphicsViewer
+        JPanel finalGraphicsViewer = graphicsViewer;
         graphicsViewer.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 // Get the mouse coordinates and adjust by the center
-                int centerX = graphicsViewer.getWidth() / 2;
-                int centerY = graphicsViewer.getHeight() / 2;
+                int centerX = finalGraphicsViewer.getWidth() / 2;
+                int centerY = finalGraphicsViewer.getHeight() / 2;
                 int x = e.getX() - centerX;
                 int y = -(e.getY() - centerY);  // Invert y to match traditional Cartesian coordinates
 
@@ -167,6 +175,7 @@ public class ChartIDE {
         JScrollPane scrollPane = new JScrollPane(languageEditor);
         splitPane.setRightComponent(scrollPane);
 
+        JPanel finalGraphicsViewer1 = graphicsViewer;
         languageEditor.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -174,7 +183,7 @@ public class ChartIDE {
                     String command = languageEditor.getText().trim();
                     GraphicalElement element = GraphicalElementsManager.parseCommandToElement(command);
                     GraphicalElementsManager.addElement(element);
-                    graphicsViewer.repaint();
+                    finalGraphicsViewer1.repaint();
                     languageEditor.setText(""); // Clear text editor on enter
                 }
             }
