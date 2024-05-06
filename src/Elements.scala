@@ -56,6 +56,7 @@ object GraphicalElementsManager {
 
   def parseColor(colorName: String): Color = colorName.trim.toLowerCase match {
     case "black" => Color.BLACK
+    case "white" => Color.WHITE
     case "red" => Color.RED
     case "green" => Color.GREEN
     case "blue" => Color.BLUE

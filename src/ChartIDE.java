@@ -29,7 +29,7 @@ public class ChartIDE {
         // Create the main frame
         JFrame frame = new JFrame("Chart IDE");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1000, 600);
+        frame.setSize(1400 , 750);
 
         // Divide the frame into two panels
         JSplitPane splitPane = new JSplitPane();
