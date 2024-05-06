@@ -1,0 +1,16 @@
+Pie chart:
+- bounding-box(-500,-300,500,300)
+- circle(-250,50,175)
+- draw(green, line(-250,50,-106,150), line(-250,50,-350,192))
+- draw(red, line(-250,50,-79,12), line(-250,50,-105,150))
+- draw(blue, line(-250,50,-219,-121), line(-250,50,-79,11))
+- draw(yellow, line(-250,50,-220,-121), line(-250,50,-351,191))
+- draw(black, text(-235,166, "Green Pie"), text(-141,71, "Red Pie"), text(-191,-46, "Blue Pie"), text(-339,10, "Yellow Pie"), text(-290,256, "Popularity of Pie Colors"))
+
+
+Bar chart:
+- draw(black, rectangle(50,-225,475,225), rectangle(100,-200,150,73), rectangle(200,-200,250,42), rectangle(300,-200,350,181), rectangle(400,-200, 450, 105), text(75,-205, "0"), text(75,-105, "25"), text(75,-5, "50"), text(75,95, "75"), text(75,195, "100"), text(200,250, "Percentage of Color Used for Charts"))
+- fill(red, rectangle(101,-200,150,72))
+- fill(blue, rectangle(201,-200,250,42))
+- fill(green, rectangle(301,-200,350,181))
+- fill(yellow, rectangle(401,-200, 450, 105))
