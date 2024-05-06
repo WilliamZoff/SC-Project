@@ -6,6 +6,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import elements.GraphicalElementsManager;
+import elements.GraphicalElement;
+
+
 public class ChartIDE {
     public static void main(String[] args) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         // Change skin of Swing elements to "Windows" theme

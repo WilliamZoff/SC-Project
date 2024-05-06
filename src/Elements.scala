@@ -1,4 +1,6 @@
 //@Logika: --par --par-branch --background type
+package elements
+
 import org.sireum.{Option => _, String => _, None => _, Some => _, _}
 import java.awt.{BasicStroke, Color, Graphics, Graphics2D}
 import scala.jdk.CollectionConverters._

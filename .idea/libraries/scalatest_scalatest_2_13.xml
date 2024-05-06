@@ -1,0 +1,28 @@
+<component name="libraryTable">
+  <library name="scalatest.scalatest_2.13" type="repository">
+    <properties maven-id="org.scalatest:scalatest_2.13:3.2.16" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/scalatest_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-library-2.13.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-core_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-compatible-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalactic_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-xml_2.13-2.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-featurespec_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-flatspec_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-freespec_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-funsuite_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-funspec_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-propspec_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-refspec_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-wordspec_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-diagrams_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-matchers-core_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-shouldmatchers_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scalatest-mustmatchers_2.13-3.2.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-reflect-2.13.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
